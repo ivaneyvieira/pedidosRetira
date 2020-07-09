@@ -1,0 +1,70 @@
+package br.com.astrosoft.pedidoRetira.view.main
+
+import br.com.astrosoft.AppConfig
+import br.com.astrosoft.framework.view.PainelGrid
+import br.com.astrosoft.framework.view.addColumnButtonClipBoard
+import br.com.astrosoft.pedidoRetira.model.beans.PedidoRetira
+import br.com.astrosoft.pedidoRetira.model.beans.UserSaci
+import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroLink
+import br.com.astrosoft.pedidoRetira.viewmodel.IPedidoLinkView
+import com.github.mvysny.karibudsl.v10.button
+import com.github.mvysny.karibudsl.v10.onLeftClick
+import com.vaadin.flow.component.button.ButtonVariant.LUMO_SMALL
+import com.vaadin.flow.component.datepicker.DatePicker
+import com.vaadin.flow.component.grid.Grid
+import com.vaadin.flow.component.icon.VaadinIcon
+import com.vaadin.flow.component.textfield.IntegerField
+import com.vaadin.flow.component.textfield.TextField
+import java.time.LocalDate
+
+class PainelGridLink(view: IPedidoLinkView, blockUpdate: () -> Unit): PainelGrid<PedidoRetira>(view, blockUpdate) {
+  override fun Grid<PedidoRetira>.gridConfig() {
+    addColumnButtonClipBoard(VaadinIcon.ARROW_FORWARD, view::marcaLink, {noteClipBoard})
+    colLoja()
+    colnumPedido()
+    colDataPedido()
+    //colHoraPedido()
+    colValorFrete()
+    colTotal()
+    colMetodo()
+    colCartao()
+    colStatusTef()
+    colUserLink()
+    colWhatsapp()
+    colEmpno()
+    colVendedor()
+    colCliente()
+    colUsername()
+  }
+  
+  override fun filterBar() = FilterBarPedido()
+  
+  inner class FilterBarPedido: FilterBar(), IFiltroLink {
+    lateinit var edtPedido: IntegerField
+    lateinit var edtData: DatePicker
+    lateinit var edtVendedor: TextField
+    
+    override fun FilterBar.contentBlock() {
+      val userSaci = AppConfig.userSaci as UserSaci
+      button("Desmarca Link") {
+        isVisible = userSaci.admin
+        icon = VaadinIcon.CHECK_CIRCLE_O.create()
+        addThemeVariants(LUMO_SMALL)
+        onLeftClick {view.desmarcaUserLink()}
+      }
+      edtPedido = edtPedido() {
+        addValueChangeListener {blockUpdate()}
+      }
+      edtVendedor = edtVendedor() {
+        addValueChangeListener {blockUpdate()}
+      }
+      edtData = edtDataPedido() {
+        addValueChangeListener {blockUpdate()}
+      }
+    }
+    
+    override fun numPedido(): Int = edtPedido.value ?: 0
+    override fun vendedor(): String = edtVendedor.value ?: ""
+    override fun data(): LocalDate? = edtData.value
+  }
+}
