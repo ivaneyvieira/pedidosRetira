@@ -20,7 +20,6 @@ import com.vaadin.flow.component.DomEvent
 import com.vaadin.flow.component.HasComponents
 import com.vaadin.flow.component.button.Button
 import com.vaadin.flow.component.button.ButtonVariant
-import com.vaadin.flow.component.button.ButtonVariant.LUMO_SMALL
 import com.vaadin.flow.component.charts.model.style.SolidColor
 import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n
@@ -46,7 +45,6 @@ import com.vaadin.flow.router.BeforeEnterObserver
 import com.vaadin.flow.router.BeforeLeaveEvent
 import com.vaadin.flow.router.BeforeLeaveObserver
 import com.vaadin.flow.shared.Registration
-import org.claspina.confirmdialog.ButtonOption
 import org.claspina.confirmdialog.ButtonOption.caption
 import org.claspina.confirmdialog.ButtonOption.closeOnClick
 import org.claspina.confirmdialog.ButtonType.OK
@@ -91,13 +89,12 @@ abstract class ViewLayout<VM: ViewModel<*>>: VerticalLayout(), IView, BeforeLeav
   }
   
   fun showForm(caption: String, form: FormLayout, runConfirm: (() -> Unit)) {
-    val form = ConfirmDialog.create()
+    ConfirmDialog.create()
       .withCaption(caption)
       .withMessage(form)
       .withButton(OK, Runnable {runConfirm()}, caption("Confirma"), closeOnClick(true))
       .withCancelButton(caption("Cancela"))
-
-      form.open()
+      .open()
   }
   
   fun showQuestion(msg: String, execYes: () -> Unit) {
