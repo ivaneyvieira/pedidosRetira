@@ -58,11 +58,11 @@ class UserSaci: IUser {
     }
   
   companion object {
-    private val BIT_ATIVO = 2.pow(9)
-    private val BIT_VENDA = 2.pow(0)
-    private val BIT_SEPARA = 2.pow(1)
-    private val BIT_ENTREGUE = 2.pow(2)
-    private val BIT_EDITOR = 2.pow(3)
+    private val BIT_ATIVO = 2.pow(10)
+    private val BIT_VENDA = 2.pow(6)
+    private val BIT_SEPARA = 2.pow(7)
+    private val BIT_ENTREGUE = 2.pow(8)
+    private val BIT_EDITOR = 2.pow(9)
     
     fun findAll(): List<UserSaci>? {
       return saci.findAllUser()
