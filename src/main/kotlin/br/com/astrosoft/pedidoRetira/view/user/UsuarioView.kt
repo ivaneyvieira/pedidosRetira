@@ -134,23 +134,17 @@ class UserCrudFormFactory(private val viewModel: UsuarioViewModel): AbstractCrud
             binder.bind(this, UserSaci::impressora.name)
           }
         if(operation in listOf(ADD, READ, DELETE, UPDATE)) {
-          checkBox("Pedido") {
-            binder.bind(this, UserSaci::acl_pedido.name)
+          checkBox("Venda") {
+            binder.bind(this, UserSaci::acl_venda.name)
           }
-          checkBox("Link") {
-            binder.bind(this, UserSaci::acl_link.name)
+          checkBox("Separa") {
+            binder.bind(this, UserSaci::acl_separa.name)
           }
-          checkBox("Pendente") {
-            binder.bind(this, UserSaci::acl_pendente.name)
+          checkBox("Entregue") {
+            binder.bind(this, UserSaci::acl_entregue.name)
           }
-          checkBox("Finalizar") {
-            binder.bind(this, UserSaci::acl_finalizar.name)
-          }
-          checkBox("Faturado") {
-            binder.bind(this, UserSaci::acl_faturado.name)
-          }
-          checkBox("Outros Status") {
-            binder.bind(this, UserSaci::acl_outros.name)
+          checkBox("Editor") {
+            binder.bind(this, UserSaci::acl_editor.name)
           }
         }
       }

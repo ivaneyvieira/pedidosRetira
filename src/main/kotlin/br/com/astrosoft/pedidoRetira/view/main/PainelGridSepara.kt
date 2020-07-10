@@ -5,45 +5,36 @@ import br.com.astrosoft.framework.view.PainelGrid
 import br.com.astrosoft.framework.view.addColumnButton
 import br.com.astrosoft.pedidoRetira.model.beans.PedidoRetira
 import br.com.astrosoft.pedidoRetira.model.beans.UserSaci
-import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroGerarLink
-import br.com.astrosoft.pedidoRetira.viewmodel.IPedidoLinkView
+import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroSepara
+import br.com.astrosoft.pedidoRetira.viewmodel.IPedidoRetiraView
 import com.github.mvysny.karibudsl.v10.button
 import com.github.mvysny.karibudsl.v10.onLeftClick
 import com.vaadin.flow.component.button.ButtonVariant.LUMO_SMALL
-import com.vaadin.flow.component.datepicker.DatePicker
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.icon.VaadinIcon
 import com.vaadin.flow.component.textfield.IntegerField
 import com.vaadin.flow.component.textfield.TextField
-import java.time.LocalDate
 
-class PainelGridGerarLink(view: IPedidoLinkView, blockUpdate: () -> Unit): PainelGrid<PedidoRetira>(view, blockUpdate) {
+class PainelGridSepara(view: IPedidoRetiraView, blockUpdate: () -> Unit): PainelGrid<PedidoRetira>(view, blockUpdate) {
   override fun Grid<PedidoRetira>.gridConfig() {
-    addColumnButton(VaadinIcon.ARROW_FORWARD, execButton = {
-      view.marcaUserLink(it)
-    })
+    addColumnButton(VaadinIcon.ARROW_FORWARD, view::marcaSepara)
     colLoja()
     colnumPedido()
     colDataPedido()
-    //colHoraPedido()
-    colValorFrete()
-    colTotal()
-    colMetodo()
-    colCartao()
-    colStatusTef()
-    colWhatsapp()
-    colEmpno()
+    colNotaFiscal()
+    colDataNota()
+    colValor()
+    colUsuarioV()
     colVendedor()
-    colCliente()
-    colUsername()
+    colObs()
   }
   
   override fun filterBar() = FilterBarPedido()
   
-  inner class FilterBarPedido: FilterBar(), IFiltroGerarLink {
-    lateinit var edtPedido: IntegerField
-    lateinit var edtData: DatePicker
-    lateinit var edtVendedor: TextField
+  inner class FilterBarPedido: FilterBar(), IFiltroSepara {
+    lateinit var edtNota: TextField
+    lateinit var edtVendedor: IntegerField
+    lateinit var edtUsuario: IntegerField
     
     override fun FilterBar.contentBlock() {
       val userSaci = AppConfig.userSaci as UserSaci
@@ -51,21 +42,23 @@ class PainelGridGerarLink(view: IPedidoLinkView, blockUpdate: () -> Unit): Paine
         isVisible = userSaci.admin
         icon = VaadinIcon.CHECK_CIRCLE_O.create()
         addThemeVariants(LUMO_SMALL)
-        onLeftClick {view.desmarcaPedidoLink()}
+        onLeftClick {view.desMarcaVenda(selectionItem())}
       }
-      edtPedido = edtPedido() {
+      edtNota = numNota {
         addValueChangeListener {blockUpdate()}
       }
-      edtVendedor = edtVendedor() {
+      edtVendedor = vendedor {
         addValueChangeListener {blockUpdate()}
       }
-      edtData = edtDataPedido() {
+      edtUsuario = usuario {
         addValueChangeListener {blockUpdate()}
       }
     }
     
-    override fun numPedido(): Int = edtPedido.value ?: 0
-    override fun vendedor(): String = edtVendedor.value ?: ""
-    override fun data(): LocalDate? = edtData.value
+    override fun numNota(): String = edtNota.value ?: ""
+    
+    override fun vendedor(): Int = edtVendedor.value ?: 0
+    
+    override fun usuarioV(): Int = edtUsuario.value ?: 0
   }
 }

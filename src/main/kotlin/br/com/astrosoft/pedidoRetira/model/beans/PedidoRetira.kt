@@ -2,51 +2,22 @@ package br.com.astrosoft.pedidoRetira.model.beans
 
 import br.com.astrosoft.AppConfig
 import br.com.astrosoft.pedidoRetira.model.saci
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.time.LocalDate
-import java.time.LocalTime
 
 data class PedidoRetira(val loja: Int,
-                        val numPedido: Int,
-                        val dataPedido: LocalDate?,
-                        val horaPedido: LocalTime?,
-                        val metodo: Int,
-                        val nfnoNota: String,
-                        val nfseNota: String,
-                        val dataNota: LocalDate?,
-                        val horaNota: LocalTime,
-                        val obs: String,
-                        val username: String,
-                        val dataLink: LocalDate?,
-                        val horaLink: LocalTime?,
-                        val nota: String,
-                        val valorFrete: Double?,
-                        val total: Double?,
-                        val valorLink: Double,
-                        val cartao: String?,
-                        val whatsapp: String?,
-                        val cliente: String?,
-                        val empno: Int?,
-                        val vendedor: String?,
-                        val status: Int,
-                        val confirmado: String,
-                        val senhaVendedor: String,
-                        val marca: String,
-                        val userLink: Int,
-                        val parcelas: Int?,
-                        val autorizadora: String?,
-                        val autorizacao: String?,
-                        val nsuHost: String?,
-                        val dataTef: LocalDate?,
-                        val statusTef: String) {
+                        val pedido: Int,
+                        val dataPedido: LocalDate,
+                        val nfno: String,
+                        val nfse: String,
+                        val dataNota: LocalDate,
+                        val valor: Double,
+                        val usuarioV: Int,
+                        val usuarioS: Int,
+                        val usuarioE: Int,
+                        val vendedor: Int,
+                        val obs: String) {
   val notaFiscal: String
-    get() = numeroNota(nfnoNota, nfseNota)
-  val statusPedido
-    get() = StatusPedido.values()
-      .toList()
-      .firstOrNull {it.numero == status}
+    get() = numeroNota(nfno, nfse)
   
   private fun numeroNota(nfno: String, nfse: String): String {
     return when {
@@ -56,119 +27,63 @@ data class PedidoRetira(val loja: Int,
     }
   }
   
-  val noteClipBoard
-    get() = "$nota $numPedido:"
-  
-  fun marcaHorario(data: LocalDate?, hora: LocalTime?) {
-    saci.marcaLink(loja, numPedido, data, hora)
+  fun marcaUserVenda(user: Int) {
+    saci.marcaUserVenda(loja, pedido, user)
   }
   
-  fun marcaVendedor(marcaNova: String) {
-    saci.marcaVendedor(loja, numPedido, marcaNova)
+  fun marcaUserSepara(user: Int) {
+    saci.marcaUserSepara(loja, pedido, user)
   }
   
-  fun marcaUserLink(userLink: Int) {
-    saci.marcaUserLink(loja, numPedido, userLink)
+  fun marcaUserEntregue(user: Int) {
+    saci.marcaUserEntregue(loja, pedido, user)
   }
+  
+  fun filtroNota(notaFiltro: String) = notaFiscal.startsWith(notaFiltro) || notaFiltro.trim() == ""
+  
+  fun filtroVendedor(vendedorFiltro: Int) =vendedorFiltro == vendedor || vendedorFiltro == 0
+  
+  fun fintroUsuarioV(usuarioFiltro : Int) = usuarioFiltro == usuarioV || usuarioFiltro == 0
+  
+  fun fintroUsuarioS(usuarioFiltro : Int) = usuarioFiltro == usuarioS || usuarioFiltro == 0
+  
+  fun fintroUsuarioE(usuarioFiltro : Int) = usuarioFiltro == usuarioE || usuarioFiltro == 0
+  
+  val isVenda
+    get() = usuarioE == 0 && usuarioS == 0 && usuarioV == 0
+  val isSepara
+    get() = usuarioE == 0 && usuarioS == 0 && usuarioV != 0
+  val isEntregue
+    get() = usuarioE == 0 && usuarioS != 0
+  val isEditor
+    get() = usuarioE != 0
   
   companion object {
     private val storeno: Int by lazy {
       UserSaci.findUser(AppConfig.userSaci?.login)?.storeno ?: 0
     }
-    private val statusValidosPedido = listOf(1, 2, 8)
-    private val statusTefOutros = listOf("NOV", "NEG", "INV", "EST", "EXP", "ABA", "CAN")
-    private val statusTefConfirmado = listOf("CON")
-    private val list = mutableListOf<PedidoRetira>().apply {
-      addAll(saci.listaPedidoLink(storeno))
-    }
-    private var time = LocalTime.now()
     
     @Synchronized
     fun updateList(): List<PedidoRetira> {
-      /*
-      val timeNow = LocalTime.now()
-      val duration = Duration.between(time, timeNow).seconds
-      
-      if(duration >= 10) {
-        val newList = saci.listaPedidoLink(storeno)
-        list.clear()
-        list.addAll(newList)
-        time = LocalTime.now()
-      }
-      return list
-      */
-      return saci.listaPedidoLink(storeno);
+      return saci.listaPedidoRetira(storeno);
     }
     
-    fun listaPedido(): List<PedidoRetira> {
+    fun listaVenda(): List<PedidoRetira> {
+      return updateList().filter {it.isVenda}
+    }
+    
+    fun listaSepara(): List<PedidoRetira> {
+      return updateList().filter {it.isSepara}
+    }
+    
+    fun listaEntregue(): List<PedidoRetira> {
+      return updateList().filter {it.isEntregue}
+    }
+    
+    fun listaEditor(): List<PedidoRetira> {
       return updateList().filter {
-        it.notaFiscal == "" && it.dataLink == null && statusValidosPedido.contains(it.status) && it.marca == ""
+        it.isEditor
       }
-    }
-    
-    fun listaGerarLink(): List<PedidoRetira> {
-      return updateList().filter {
-        it.notaFiscal == "" && it.dataLink == null && statusValidosPedido.contains(it.status) && it.marca != "" &&
-        it.userLink == 0
-      }
-    }
-    
-    fun listaLink(): List<PedidoRetira> {
-      val userSaci = AppConfig.userSaci as UserSaci
-      return updateList().filter {
-        it.notaFiscal == "" && it.dataLink == null && statusValidosPedido.contains(it.status) && it.marca != "" &&
-        (it.userLink == userSaci.no || (userSaci.admin && it.userLink != 0))
-      }
-    }
-    
-    fun listaPendente(): List<PedidoRetira> {
-      return updateList().filter {
-        it.dataLink != null && it.notaFiscal == "" && it.confirmado == "N" && it.statusTef in listOf("AGU", "")
-      }
-    }
-    
-    fun listaFinalizar(): List<PedidoRetira> {
-      return updateList().filter {
-        it.dataLink != null && it.notaFiscal == "" && it.confirmado == "S"
-        && it.statusTef in statusTefConfirmado
-      }
-    }
-    
-    fun listaFaturado(): List<PedidoRetira> {
-      return updateList().filter {
-        it.notaFiscal != ""
-      }
-    }
-    
-    fun listaOutros(): List<PedidoRetira> {
-      return updateList().filter {
-        it.statusTef in statusTefOutros;
-      }
-    }
-    
-    fun uploadFile(inputStream: InputStream) {
-      val buffer = BufferedReader(InputStreamReader(inputStream))
-      val records =
-        buffer.lineSequence()
-          .map {line ->
-            line.split(';')
-              .toList()
-          }
-      saci.insertFile(records.toList())
     }
   }
-}
-
-enum class StatusPedido(val numero: Int, val descricao: String) {
-  INCLUIDO(0, "Incluído"),
-  ORCADO(1, "Orçado"),
-  RESERVADO(2, "Reservado"),
-  VENDIDO(3, "Vendido"),
-  EXPIRADO(4, "Expirado"),
-  CANCELADO(5, "Cancelado"),
-  RESERVADO_B(6, "Reserva B"),
-  TRANSITO(7, "Trânsito"),
-  FUTURA(8, "Futura");
-  
-  override fun toString() = descricao
 }

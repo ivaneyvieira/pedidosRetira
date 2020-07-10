@@ -33,7 +33,7 @@ class QuerySaci: QueryDB(driver, url, username, password) {
     }
   }
   
-  fun listaPedidoLink(storeno: Int): List<PedidoRetira> {
+  fun listaPedidoRetira(storeno: Int): List<PedidoRetira> {
     val sql = "/sqlSaci/pedidoRetira.sql"
     val data = LocalDate.now().minusDays(15).toSaciDate()
     return query(sql, PedidoRetira::class) {
@@ -42,47 +42,30 @@ class QuerySaci: QueryDB(driver, url, username, password) {
     }
   }
   
-  fun marcaLink(loja: Int, numPedido: Int, data: LocalDate?, hora: LocalTime?) {
-    val sql = "/sqlSaci/marcaLink.sql"
+  fun marcaUserVenda(loja: Int, numPedido: Int, userno: Int) {
+    val sql = "/sqlSaci/marcaUserVenda.sql"
     script(sql) {
       addParameter("storeno", loja)
       addParameter("ordno", numPedido)
-      addParameter("data", data)
-      addParameter("hora", hora)
+      addParameter("userno", userno)
     }
   }
   
-  fun insertFile(records: List<List<String>>) {
-    val header =
-      records.firstOrNull()
-        .orEmpty()
-    val linhas = records.drop(1)
-    val sql = "/sqlSaci/insertTef.sql"
-    linhas.forEach {linha ->
-      script(sql) {
-        header.forEachIndexed {index, coluna ->
-          val value = linha.getOrNull(index) ?: ""
-          addOptionalParameter(coluna, value)
-        }
-      }
-    }
-  }
-  
-  fun marcaVendedor(loja: Int, numPedido: Int, marcaNova: String) {
-    val sql = "/sqlSaci/marcaVendedor.sql"
+  fun marcaUserSepara(loja: Int, numPedido: Int, userno: Int) {
+    val sql = "/sqlSaci/marcaUserSepara.sql"
     script(sql) {
       addParameter("storeno", loja)
       addParameter("ordno", numPedido)
-      addParameter("marca", marcaNova)
+      addParameter("userno", userno)
     }
   }
   
-  fun marcaUserLink(loja: Int, numPedido: Int, userLink: Int) {
-    val sql = "/sqlSaci/marcaUserLink.sql"
+  fun marcaUserEntregue(loja: Int, numPedido: Int, userno: Int) {
+    val sql = "/sqlSaci/marcaUserEntregue.sql"
     script(sql) {
       addParameter("storeno", loja)
       addParameter("ordno", numPedido)
-      addParameter("userLink", userLink)
+      addParameter("userno", userno)
     }
   }
   

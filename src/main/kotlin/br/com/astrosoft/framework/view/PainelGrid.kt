@@ -1,7 +1,7 @@
 package br.com.astrosoft.framework.view
 
 import br.com.astrosoft.pedidoRetira.view.main.FilterBar
-import br.com.astrosoft.pedidoRetira.viewmodel.IPedidoLinkView
+import br.com.astrosoft.pedidoRetira.viewmodel.IPedidoRetiraView
 import com.github.mvysny.karibudsl.v10.grid
 import com.vaadin.flow.component.grid.Grid
 import com.vaadin.flow.component.grid.GridVariant.LUMO_COLUMN_BORDERS
@@ -10,7 +10,7 @@ import com.vaadin.flow.component.grid.GridVariant.LUMO_ROW_STRIPES
 import com.vaadin.flow.component.orderedlayout.VerticalLayout
 import com.vaadin.flow.data.provider.ListDataProvider
 
-abstract class PainelGrid<T>(val view : IPedidoLinkView, val blockUpdate: () -> Unit): VerticalLayout() {
+abstract class PainelGrid<T>(val view: IPedidoRetiraView, val blockUpdate: () -> Unit): VerticalLayout() {
   private var grid: Grid<T>
   private val dataProvider = ListDataProvider<T>(mutableListOf())
   val filterBar: FilterBar by lazy {
@@ -27,6 +27,8 @@ abstract class PainelGrid<T>(val view : IPedidoLinkView, val blockUpdate: () -> 
       this.gridConfig()
     }
   }
+  
+  fun selectionItem(): T? = grid.asSingleSelect().value
   
   protected abstract fun filterBar(): FilterBar
   

@@ -11,12 +11,11 @@ class UserSaci: IUser {
   override var senha: String = ""
   override fun roles(): List<String> {
     val roles = if(admin) listOf("ADMIN") else listOf("USER")
-    val rolePedido = if(acl_pedido) listOf("PEDIDO") else listOf()
-    val roleLink = if(acl_link) listOf("LINK") else listOf()
-    val rolePendente = if(acl_pendente) listOf("PENDENTE") else listOf()
-    val roleFinalizar = if(acl_finalizar) listOf("FINALIZAR") else listOf()
-    val roleFaturado = if(acl_faturado) listOf("FATURADO") else listOf()
-    return roles + rolePedido + roleLink + rolePendente + roleFinalizar + roleFaturado
+    val roleVenda = if(acl_venda) listOf("VENDA") else listOf()
+    val roleSepara = if(acl_separa) listOf("SEPARA") else listOf()
+    val roleEntregue = if(acl_entregue) listOf("ENTREGUE") else listOf()
+    val roleEditor = if(acl_editor) listOf("EDITOR") else listOf()
+    return roles + roleVenda + roleSepara + roleEntregue + roleEditor
   }
   
   var bitAcesso: Int = 0
@@ -33,51 +32,37 @@ class UserSaci: IUser {
     }
   val admin
     get() = login == "ADM"
-  var acl_pedido
-    get() = (bitAcesso and BIT_PEDIDO) != 0 || admin
+  var acl_venda
+    get() = (bitAcesso and BIT_VENDA) != 0 || admin
     set(value) {
-      bitAcesso = if(value) bitAcesso or BIT_PEDIDO
-      else bitAcesso and BIT_PEDIDO.inv()
+      bitAcesso = if(value) bitAcesso or BIT_VENDA
+      else bitAcesso and BIT_VENDA.inv()
     }
-  var acl_link
-    get() = (bitAcesso and BIT_LINK) != 0 || admin
+  var acl_separa
+    get() = (bitAcesso and BIT_SEPARA) != 0 || admin
     set(value) {
-      bitAcesso = if(value) bitAcesso or BIT_LINK
-      else bitAcesso and BIT_LINK.inv()
+      bitAcesso = if(value) bitAcesso or BIT_SEPARA
+      else bitAcesso and BIT_SEPARA.inv()
     }
-  var acl_pendente
-    get() = (bitAcesso and BIT_PENDENTE) != 0 || admin
+  var acl_entregue
+    get() = (bitAcesso and BIT_ENTREGUE) != 0 || admin
     set(value) {
-      bitAcesso = if(value) bitAcesso or BIT_PENDENTE
-      else bitAcesso and BIT_PENDENTE.inv()
+      bitAcesso = if(value) bitAcesso or BIT_ENTREGUE
+      else bitAcesso and BIT_ENTREGUE.inv()
     }
-  var acl_finalizar
-    get() = (bitAcesso and BIT_FINALIZAR) != 0 || admin
+  var acl_editor
+    get() = (bitAcesso and BIT_EDITOR) != 0 || admin
     set(value) {
-      bitAcesso = if(value) bitAcesso or BIT_FINALIZAR
-      else bitAcesso and BIT_FINALIZAR.inv()
-    }
-  var acl_faturado
-    get() = (bitAcesso and BIT_FATURADO) != 0 || admin
-    set(value) {
-      bitAcesso = if(value) bitAcesso or BIT_FATURADO
-      else bitAcesso and BIT_FATURADO.inv()
-    }
-  var acl_outros
-    get() = (bitAcesso and BIT_OUTROS) != 0 || admin
-    set(value) {
-      bitAcesso = if(value) bitAcesso or BIT_OUTROS
-      else bitAcesso and BIT_OUTROS.inv()
+      bitAcesso = if(value) bitAcesso or BIT_EDITOR
+      else bitAcesso and BIT_EDITOR.inv()
     }
   
   companion object {
     private val BIT_ATIVO = 2.pow(9)
-    private val BIT_PEDIDO = 2.pow(0)
-    private val BIT_LINK = 2.pow(1)
-    private val BIT_PENDENTE = 2.pow(2)
-    private val BIT_FINALIZAR = 2.pow(3)
-    private val BIT_FATURADO = 2.pow(4)
-    private val BIT_OUTROS = 2.pow(4)
+    private val BIT_VENDA = 2.pow(0)
+    private val BIT_SEPARA = 2.pow(1)
+    private val BIT_ENTREGUE = 2.pow(2)
+    private val BIT_EDITOR = 2.pow(3)
     
     fun findAll(): List<UserSaci>? {
       return saci.findAllUser()

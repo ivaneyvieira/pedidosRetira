@@ -1,9 +1,9 @@
 SELECT E.storeno                                    AS loja,
        E.ordno                                      AS pedido,
-       Cast(E.date AS DATE)                         AS dataPedido,
-       N.nfno                                       AS nfno,
+       CAST(E.date AS DATE)                         AS dataPedido,
+       CAST(N.nfno AS CHAR)                         AS nfno,
        N.nfse                                       AS nfse,
-       N.issuedate                                  AS dataNota,
+       CAST(N.issuedate AS DATE)                    AS dataNota,
        N.grossamt / 100                             AS valor,
        E.s15                                        AS usuarioV,
        E.s14                                        AS usuarioS,
@@ -17,7 +17,8 @@ FROM sqldados.eord           AS E
 	       ON E.storeno = N.storeno AND E.nfno = N.nfno AND E.nfse = N.nfse
   LEFT JOIN  sqldados.eordrk AS R
 	       ON (R.storeno = E.storeno AND R.ordno = E.ordno)
-WHERE E.date >= :date
-  AND E.storeno = :storeno
+WHERE E.date >= :data
+  AND (E.storeno = :storeno OR :storeno = 0)
   AND N.tipo = 0
+  AND N.status <> 1
   AND R.remarks__480 LIKE 'RETIRA%'

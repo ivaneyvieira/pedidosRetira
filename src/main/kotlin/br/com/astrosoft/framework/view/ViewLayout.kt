@@ -46,6 +46,7 @@ import com.vaadin.flow.router.BeforeEnterObserver
 import com.vaadin.flow.router.BeforeLeaveEvent
 import com.vaadin.flow.router.BeforeLeaveObserver
 import com.vaadin.flow.shared.Registration
+import org.claspina.confirmdialog.ButtonOption
 import org.claspina.confirmdialog.ButtonOption.caption
 import org.claspina.confirmdialog.ButtonOption.closeOnClick
 import org.claspina.confirmdialog.ButtonType.OK
@@ -90,12 +91,13 @@ abstract class ViewLayout<VM: ViewModel<*>>: VerticalLayout(), IView, BeforeLeav
   }
   
   fun showForm(caption: String, form: FormLayout, runConfirm: (() -> Unit)) {
-    ConfirmDialog.create()
+    val form = ConfirmDialog.create()
       .withCaption(caption)
       .withMessage(form)
       .withButton(OK, Runnable {runConfirm()}, caption("Confirma"), closeOnClick(true))
       .withCancelButton(caption("Cancela"))
-      .open()
+
+      form.open()
   }
   
   fun showQuestion(msg: String, execYes: () -> Unit) {

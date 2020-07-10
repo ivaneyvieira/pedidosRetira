@@ -6,17 +6,13 @@ import br.com.astrosoft.framework.view.tabGrid
 import br.com.astrosoft.pedidoRetira.model.beans.PedidoRetira
 import br.com.astrosoft.pedidoRetira.model.beans.UserSaci
 import br.com.astrosoft.pedidoRetira.view.layout.PedidoRetiraLayout
-import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroFaturado
-import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroFinalizar
-import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroGerarLink
-import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroLink
-import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroOutros
-import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroPedido
-import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroPendente
-import br.com.astrosoft.pedidoRetira.viewmodel.IPedidoLinkView
+import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroEditor
+import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroEntregue
+import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroSepara
+import br.com.astrosoft.pedidoRetira.viewmodel.IFiltroVenda
+import br.com.astrosoft.pedidoRetira.viewmodel.IPedidoRetiraView
 import br.com.astrosoft.pedidoRetira.viewmodel.PedidoRetiraViewModel
 import br.com.astrosoft.pedidoRetira.viewmodel.SenhaUsuario
-import br.com.astrosoft.pedidoRetira.viewmodel.SenhaVendendor
 import com.github.mvysny.karibudsl.v10.bind
 import com.github.mvysny.karibudsl.v10.passwordField
 import com.github.mvysny.karibudsl.v10.tabSheet
@@ -27,19 +23,15 @@ import com.vaadin.flow.component.textfield.TextFieldVariant.LUMO_SMALL
 import com.vaadin.flow.data.binder.Binder
 import com.vaadin.flow.router.PageTitle
 import com.vaadin.flow.router.Route
-import java.io.InputStream
 
 @Route(layout = PedidoRetiraLayout::class)
 @PageTitle(AppConfig.title)
 @HtmlImport("frontend://styles/shared-styles.html")
-class PedidoRetiraView: ViewLayout<PedidoRetiraViewModel>(), IPedidoLinkView {
-  private val gridPedido = PainelGridPedido(this) {viewModel.updateGridPedido()}
-  private val gridLink = PainelGridLink(this) {viewModel.updateGridLink()}
-  private val gridGerarLink = PainelGridGerarLink(this) {viewModel.updateGridGerarLink()}
-  private val gridPendente = PainelGridPendente(this) {viewModel.updateGridPendente()}
-  private val gridFinalizar = PainelGridFinalizado(this) {viewModel.updateGridFinalizar()}
-  private val gridFaturar = PainelGridFaturado(this) {viewModel.updateGridFaturado()}
-  private val gridOutros = PainelGridOutros(this) {viewModel.updateGridOutros()}
+class PedidoRetiraView: ViewLayout<PedidoRetiraViewModel>(), IPedidoRetiraView {
+  private val gridVenda = PainelGridVenda(this) {viewModel.updateGridVenda()}
+  private val gridSepara = PainelGridSepara(this) {viewModel.updateGridSepara()}
+  private val gridEntregue = PainelGridEntregue(this) {viewModel.updateGridEntregue()}
+  private val gridEditor = PainelGridEditor(this) {viewModel.updateGridEditor()}
   override val viewModel: PedidoRetiraViewModel = PedidoRetiraViewModel(this)
   
   override fun isAccept() = true
@@ -48,156 +40,114 @@ class PedidoRetiraView: ViewLayout<PedidoRetiraViewModel>(), IPedidoLinkView {
     val user = AppConfig.userSaci as UserSaci
     tabSheet {
       setSizeFull()
-      if(user.acl_pedido) tabGrid(TAB_PEDIDO, gridPedido)
-      if(user.acl_link) tabGrid(TAB_GERAR_LINK, gridGerarLink)
-      if(user.acl_link) tabGrid(TAB_LINK, gridLink)
-      if(user.acl_pendente) tabGrid(TAB_PENDENTE, gridPendente)
-      if(user.acl_finalizar) tabGrid(TAB_FINALIZAR, gridFinalizar)
-      if(user.acl_faturado) tabGrid(TAB_FATURADO, gridFaturar)
-      if(user.acl_outros) tabGrid(TAB_OUTROS, gridOutros)
+      if(user.acl_venda) tabGrid(TAB_VENDA, gridVenda)
+      if(user.acl_separa) tabGrid(TAB_SEPARA, gridSepara)
+      if(user.acl_entregue) tabGrid(TAB_ENTREGUE, gridEntregue)
+      if(user.acl_editor) tabGrid(TAB_EDITOR, gridEditor)
     }
     when {
-      user.acl_pedido    -> viewModel.updateGridPedido()
-      user.acl_link      -> viewModel.updateGridGerarLink()
-      user.acl_pendente  -> viewModel.updateGridPendente()
-      user.acl_finalizar -> viewModel.updateGridFinalizar()
-      user.acl_faturado  -> viewModel.updateGridFaturado()
-      user.acl_outros    -> viewModel.updateGridOutros()
+      user.acl_venda    -> viewModel.updateGridVenda()
+      user.acl_separa   -> viewModel.updateGridSepara()
+      user.acl_entregue -> viewModel.updateGridEntregue()
+      user.acl_editor   -> viewModel.updateGridEditor()
     }
   }
   
-  override fun marcaUserLink(pedidoLink: PedidoRetira) {
-    val userSaci = AppConfig.userSaci as UserSaci
-    val form = FormUsuario()
-    val usuario = SenhaUsuario(userSaci.login, "")
-    form.binder.bean = usuario
-    showForm("Senha do Usuário", form) {
-      val senha = form.binder.bean.senha ?: "#######"
-      viewModel.marcaUserLink(pedidoLink, senha)
+  override fun updateGridVenda(itens: List<PedidoRetira>) {
+    gridVenda.updateGrid(itens)
+  }
+  
+  override fun updateGridSepara(itens: List<PedidoRetira>) {
+    gridSepara.updateGrid(itens)
+  }
+  
+  override fun updateGridEntregue(itens: List<PedidoRetira>) {
+    gridEntregue.updateGrid(itens)
+  }
+  
+  override fun updateGridEditor(itens: List<PedidoRetira>) {
+    gridEditor.updateGrid(itens)
+  }
+  
+  override val filtroVenda: IFiltroVenda
+    get() = gridVenda.filterBar as IFiltroVenda
+  override val filtroSepara: IFiltroSepara
+    get() = gridSepara.filterBar as IFiltroSepara
+  override val filtroEntregue: IFiltroEntregue
+    get() = gridEntregue.filterBar as IFiltroEntregue
+  override val filtroEditor: IFiltroEditor
+    get() = gridEditor.filterBar as IFiltroEditor
+  
+  private fun marcaUsuario(pedidoRetira: PedidoRetira?, action: (UserSaci, PedidoRetira) -> Unit) {
+    if(pedidoRetira == null)
+      showError("Pedido não selecionado")
+    else {
+      val userSaci = AppConfig.userSaci as UserSaci
+      val form = FormUsuario(userSaci.login)
+      
+      showForm("Senha do Usuário", form) {
+        val senha = form.usuario.senha ?: "#######"
+        if(senha == userSaci.senha)
+          action(userSaci, pedidoRetira)
+        else
+          showError("A senha não confere")
+      }
     }
   }
   
-  override fun desmarcaUserLink() {
-    viewModel.desmarcaUserLink()
+  private fun desmarcaUsuario(pedidoRetira: PedidoRetira?, action: (PedidoRetira) -> Unit) {
+    if(pedidoRetira == null)
+      showError("Pedido não selecionado")
+    else
+      action(pedidoRetira)
   }
   
-  override fun desmarcaPedidoLink() {
-    viewModel.desmarcaVendedor()
-  }
-  
-  override fun marcaLink(pedidoLink: PedidoRetira) {
-    viewModel.marcaPedido(pedidoLink)
-  }
-  
-  override fun uploadFile(inputStream: InputStream) {
-    viewModel.uploadFile(inputStream)
-  }
-  
-  override fun desmarcaPedido() {
-    if(itensSelecionadoPendente().isEmpty()) showError("Nenhum pedido foi selecionado")
-    viewModel.desmarcaPedido()
-  }
-  
-  override fun marcaVendedor(pedidoLink: PedidoRetira) {
-    val form = FormVendedor()
-    val vendendor = SenhaVendendor(pedidoLink.vendedor ?: "Não encontrado", "")
-    form.binder.bean = vendendor
-    showForm("Senha do vendedor", form) {
-      val senha = form.binder.bean.senha ?: "#######"
-      viewModel.marcaVendedor(pedidoLink, senha)
+  override fun marcaVenda(pedidoRetira: PedidoRetira?) {
+    marcaUsuario(pedidoRetira) {user, pedido ->
+      viewModel.marcaUserVenda(user.no, pedido)
     }
   }
   
-  override fun itensSelecionadoPedido(): List<PedidoRetira> {
-    return gridPedido.selectedItems()
+  override fun desMarcaVenda(pedidoRetira: PedidoRetira?) {
+    desmarcaUsuario(pedidoRetira) {pedido ->
+      viewModel.desmarcaUserVenda(pedido)
+    }
   }
   
-  override fun itensSelecionadoGerarLink(): List<PedidoRetira> {
-    return gridGerarLink.selectedItems()
-  }
-
-  override fun itensSelecionadoLink(): List<PedidoRetira> {
-    return gridLink.selectedItems()
+  override fun marcaSepara(pedidoRetira: PedidoRetira?) {
+    marcaUsuario(pedidoRetira) {user, pedido ->
+      viewModel.marcaUserSepara(user.no, pedido)
+    }
   }
   
-  override fun itensSelecionadoPendente(): List<PedidoRetira> {
-    return gridPendente.selectedItems()
+  override fun desMarcaSepara(pedidoRetira: PedidoRetira?) {
+    desmarcaUsuario(pedidoRetira) {pedido ->
+      viewModel.desmarcaUserSepara(pedido)
+    }
   }
   
-  override fun updateGridPedido(itens: List<PedidoRetira>) {
-    gridPedido.updateGrid(itens)
+  override fun marcaEntregue(pedidoRetira: PedidoRetira?) {
+    marcaUsuario(pedidoRetira) {user, pedido ->
+      viewModel.marcaUserEntregue(user.no, pedido)
+    }
   }
   
-  override fun updateGridLink(itens: List<PedidoRetira>) {
-    gridLink.updateGrid(itens)
+  override fun desMarcaEntregue(pedidoRetira: PedidoRetira?) {
+    desmarcaUsuario(pedidoRetira) {pedido ->
+      viewModel.desmarcaUserEntregue(pedido)
+    }
   }
-  
-  override fun updateGridGerarLink(itens: List<PedidoRetira>) {
-    gridGerarLink.updateGrid(itens)
-  }
-  
-  override fun updateGridPendente(itens: List<PedidoRetira>) {
-    gridPendente.updateGrid(itens)
-  }
-  
-  override fun updateGridFinalizar(itens: List<PedidoRetira>) {
-    gridFinalizar.updateGrid(itens)
-  }
-  
-  override fun updateGridFaturado(itens: List<PedidoRetira>) {
-    gridFaturar.updateGrid(itens)
-  }
-  
-  override fun updateGridOutros(itens: List<PedidoRetira>) {
-    gridOutros.updateGrid(itens)
-  }
-  
-  override val filtroPedido: IFiltroPedido
-    get() = gridPedido.filterBar as IFiltroPedido
-  override val filtroLink: IFiltroLink
-    get() = gridLink.filterBar as IFiltroLink
-  override val filtroGerarLink: IFiltroGerarLink
-    get() = gridGerarLink.filterBar as IFiltroGerarLink
-  override val filtroPendente: IFiltroPendente
-    get() = gridPendente.filterBar as IFiltroPendente
-  override val filtroFinalizar: IFiltroFinalizar
-    get() = gridFinalizar.filterBar as IFiltroFinalizar
-  override val filtroFaturado: IFiltroFaturado
-    get() = gridFaturar.filterBar as IFiltroFaturado
-  override val filtroOutros: IFiltroOutros
-    get() = gridOutros.filterBar as IFiltroOutros
   
   companion object {
-    const val TAB_PEDIDO: String = "Pedido"
-    const val TAB_GERAR_LINK: String = "Gerar Link"
-    const val TAB_LINK: String = "Link"
-    const val TAB_PENDENTE: String = "Pendente"
-    const val TAB_FINALIZAR: String = "Finalzar"
-    const val TAB_FATURADO: String = "Faturado"
-    const val TAB_OUTROS: String = "Outros status"
+    const val TAB_VENDA: String = "Venda"
+    const val TAB_SEPARA: String = "Separa"
+    const val TAB_ENTREGUE: String = "Entregue"
+    const val TAB_EDITOR: String = "Editor"
   }
 }
 
-class FormVendedor: FormLayout() {
-  val binder = Binder<SenhaVendendor>(SenhaVendendor::class.java)
-  
-  init {
-    textField("Nome") {
-      isEnabled = false
-      addThemeVariants(LUMO_SMALL)
-      bind(binder).bind(SenhaVendendor::nome)
-    }
-    
-    passwordField("Senha") {
-      addThemeVariants(LUMO_SMALL)
-      bind(binder).bind(SenhaVendendor::senha)
-      this.isAutofocus = true
-    }
-  }
-}
-
-class FormUsuario: FormLayout() {
-  val binder = Binder<SenhaUsuario>(SenhaUsuario::class.java)
+class FormUsuario(val username: String): FormLayout() {
+  private val binder = Binder<SenhaUsuario>(SenhaUsuario::class.java)
   
   init {
     textField("Nome") {
@@ -211,6 +161,10 @@ class FormUsuario: FormLayout() {
       bind(binder).bind(SenhaUsuario::senha)
       this.isAutofocus = true
     }
+    binder.bean = SenhaUsuario(username, "")
   }
+  
+  val usuario
+    get() = binder.bean
 }
 
