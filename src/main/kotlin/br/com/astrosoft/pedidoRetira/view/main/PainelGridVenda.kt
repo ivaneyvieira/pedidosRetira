@@ -23,6 +23,7 @@ class PainelGridVenda(view: IPedidoRetiraView, blockUpdate: () -> Unit): PainelG
     colDataPedido()
     colNotaFiscal()
     colDataNota()
+    colHoraNota()
     colValor()
     colVendedor()
     colObs()

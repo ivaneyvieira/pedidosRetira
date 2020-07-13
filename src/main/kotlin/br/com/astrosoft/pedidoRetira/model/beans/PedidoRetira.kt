@@ -3,6 +3,7 @@ package br.com.astrosoft.pedidoRetira.model.beans
 import br.com.astrosoft.AppConfig
 import br.com.astrosoft.pedidoRetira.model.saci
 import java.time.LocalDate
+import java.time.LocalTime
 
 data class PedidoRetira(val loja: Int,
                         val pedido: Int,
@@ -10,6 +11,7 @@ data class PedidoRetira(val loja: Int,
                         val nfno: String,
                         val nfse: String,
                         val dataNota: LocalDate,
+                        val horaNota: LocalTime,
                         val valor: Double,
                         val usuarioV: Int,
                         val usuarioS: Int,

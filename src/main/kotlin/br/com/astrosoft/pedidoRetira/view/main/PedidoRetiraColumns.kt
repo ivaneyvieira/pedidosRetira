@@ -3,6 +3,7 @@ package br.com.astrosoft.pedidoRetira.view.main
 import br.com.astrosoft.framework.view.addColumnDouble
 import br.com.astrosoft.framework.view.addColumnInt
 import br.com.astrosoft.framework.view.addColumnLocalDate
+import br.com.astrosoft.framework.view.addColumnLocalTime
 import br.com.astrosoft.framework.view.addColumnString
 import br.com.astrosoft.pedidoRetira.model.beans.PedidoRetira
 import com.github.mvysny.karibudsl.v10.VaadinDsl
@@ -37,10 +38,13 @@ fun Grid<PedidoRetira>.colDataNota() = addColumnLocalDate(PedidoRetira::dataNota
   setHeader("Data NF")
 }
 
+fun Grid<PedidoRetira>.colHoraNota() = addColumnLocalTime(PedidoRetira::horaNota) {
+  setHeader("Hr NF")
+}
+
 fun Grid<PedidoRetira>.colValor() = addColumnDouble(PedidoRetira::valor) {
   setHeader("Valor")
 }
-
 
 fun Grid<PedidoRetira>.colUsuarioV() = addColumnInt(PedidoRetira::usuarioV) {
   setHeader("Usuário")
