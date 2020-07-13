@@ -35,7 +35,8 @@ class QuerySaci: QueryDB(driver, url, username, password) {
   
   fun listaPedidoRetira(storeno: Int): List<PedidoRetira> {
     val sql = "/sqlSaci/pedidoRetira.sql"
-    val data = LocalDate.now().minusDays(15).toSaciDate()
+    //val data = LocalDate.now().minusDays(15).toSaciDate()
+    val data = 20200713;
     return query(sql, PedidoRetira::class) {
       addOptionalParameter("storeno", storeno)
       addOptionalParameter("data", data)
