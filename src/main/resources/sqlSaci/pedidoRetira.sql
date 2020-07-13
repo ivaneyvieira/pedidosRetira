@@ -24,4 +24,4 @@ WHERE N.issuedate >= :data
   AND (E.storeno = :storeno OR :storeno = 0)
   AND N.tipo = 0
   AND N.status <> 1
-  AND R.remarks__480 LIKE 'RETIRA%'
+  AND MID(R.remarks__480, 1, 20) LIKE '%RETIRA%'
