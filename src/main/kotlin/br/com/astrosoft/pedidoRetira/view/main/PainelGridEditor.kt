@@ -22,6 +22,7 @@ class PainelGridEditor(view: IPedidoRetiraView, blockUpdate: () -> Unit): Painel
     colDataPedido()
     colNotaFiscal()
     colDataNota()
+    colHoraNota()
     colValor()
     colUsuarioE()
     colVendedor()

@@ -24,6 +24,7 @@ class PainelGridEntregue(view: IPedidoRetiraView, blockUpdate: () -> Unit): Pain
     colDataPedido()
     colNotaFiscal()
     colDataNota()
+    colHoraNota()
     colValor()
     colUsuarioS()
     colVendedor()
