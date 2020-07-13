@@ -20,7 +20,7 @@ FROM sqldados.eord           AS E
 	       ON N.storeno = N2.storeno AND N.pdvno = N2.pdvno AND N.xano = N2.xano
   LEFT JOIN  sqldados.eordrk AS R
 	       ON (R.storeno = E.storeno AND R.ordno = E.ordno)
-WHERE E.date >= :data
+WHERE N.issuedate >= :data
   AND (E.storeno = :storeno OR :storeno = 0)
   AND N.tipo = 0
   AND N.status <> 1
